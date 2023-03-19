@@ -17,6 +17,6 @@ program variables
     print *, 'The value of pi (real) is: ', pi
     print *, 'The value of frequency (complex) is: ', frequency
     print *, 'The value of initial (character) is: ', initial
-    print *, 'The value of isOkay (logical) is: ', isOkay
+    print *, 'The value of isOka (logical) is: ', isOkay
     
   end program variables
