@@ -1,0 +1,42 @@
+
+VARIABLES
+
+    integer         – for data that represent whole numbers, positive or negative
+    real            – for floating-point data (not a whole number)
+    complex         – pair consisting of a real part and an imaginary part
+    character       – for text data
+    logical         – for data that represent boolean (true or false) values
+
+
+USOS VARIOS
+
+    print *, 'lo que quiera escribir', variable                 - muestra en pantalla lo que quiera
+    read (*,*) variable                                         - lee datos tipeados por el usuario
+    implicit none                                               - todas las variables a utilizar se deben declarar, ayuda a que
+                                                                  no haya errores
+
+OPERACIONES
+
+    ** Exponent
+    * Multiplication
+    / Division
+    + Addition
+    - Subtraction
+
+INTRINSIC MODULES
+
+    algoritmo: use, intinsic :: modulo, only: sp=>lo que necesite, dp=>lo otro que necesite
+
+        iso_fortran_env
+            sp=>real32
+            dp=>real64
+        iso_c_binding
+            sp=>c.float
+            dp=>c.double
+
+ARREGLOS
+
+nsf access crear cuenta
+
+stampede
+expanse

@@ -4,13 +4,13 @@ program variables
     integer :: amount
     real :: pi
     complex :: frequency
-    character :: initial
+    character(len = 100) :: initial
     logical :: isOkay
 
     amount = 10
     pi = 3.1415927
     frequency = (1.0, -0.5)
-    initial = 'A'
+    initial = 'As'
     isOkay = .false.
 
     print *, 'The value of amount (integer) is: ', amount
