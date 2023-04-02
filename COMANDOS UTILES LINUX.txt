@@ -1,0 +1,20 @@
+
+cd      cambiar directorio
+ls      Lista de los directorios que haya
+pwd     ruta de los directorios
+mkdir   crea directorios
+rmdir   borra directorios
+
+cp      copiar archivos
+mv      pegar archivos
+rm      borrar archivos
+
+xpdf    abrir archivo pdf        xpdf nombre.pdf &
+
+tecla tab           completar el directorio o archivo
+
+gfortran -Wall -o hello hello.f90   compilar programa
+./nombreexe                         ejecutar programa
+
+
+GITHUB
