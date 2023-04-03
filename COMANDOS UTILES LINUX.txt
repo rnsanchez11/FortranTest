@@ -18,3 +18,8 @@ gfortran -Wall -o hello hello.f90   compilar programa
 
 
 GITHUB
+git pull        traer cambios de la nube
+
+nombre del commit
++ para mandar los cambios
+push
