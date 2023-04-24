@@ -38,8 +38,8 @@ subroutine integral2(f,p,a,b,n,r)
     r = 0.0
     h = (b-a)/n
     do i = 1, n 
-    x = a + h*(i-1)
-    r = r + h*((f(x,p)) + (f(x+h,p)))/2.0   !h*(f(x) + f(x+h))/2.0
+        x = a + h*(i-1)
+        r = r + h*((f(x,p)) + (f(x+h,p)))/2.0   !h*(f(x) + f(x+h))/2.0
     enddo
 
 end subroutine integral2

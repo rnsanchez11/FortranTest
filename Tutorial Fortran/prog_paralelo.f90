@@ -1,6 +1,10 @@
 
 program integralnum
 
+    implicit none
+    use, intrinsic :: omp_lib
+
+
     real*8, external :: f
     real*8 :: a, b, r
     integer :: n, i
