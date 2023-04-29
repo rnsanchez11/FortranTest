@@ -67,4 +67,7 @@ srun --partition=gpu-debug --pty --account=<<project>> --ntasks-per-node=10 \
 module purge 
 module restore commands
 
+instalacion fortran mac
+https://ccia.ugr.es/~fjgc/fortran_mac.html
+
 
