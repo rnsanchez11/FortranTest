@@ -1,0 +1,70 @@
+log in
+training
+https://www.sdsc.edu/education_and_training/training_expanse.html#catalog
+
+cmd
+ssh rsanchezcastellanos1@login.expanse.sdsc.edu
+
+MODULES
+
+module spider <application_name>            List of the modules and extensions currently available
+module load cpu (for cpu nodes)             Load <module name> into the environment
+module load gpu (for gpu nodes)
+module list                                 List the modules that are currently loaded
+module avail                                List the modules that are available in environment
+module unload <module name>                 Remove <module name> from the environment
+module swap <module one> <module two>       Replace <module one> with <module two> in the environment
+    ejemplo
+    module load openmpi
+
+
+COMMANDS
+
+help        Help about any command
+project     Get 'project' information
+resource    Get resources
+user        Get 'user' information
+
+Flags:
+-a,         --auth authenticate the request
+-h,         --help help for user
+-p,         --plain plain no graphics output
+-v,         --verbose verbose output
+-r,         --resource string Resource to query (default: "expanse")
+
+
+AMD Compilers
+
+module load aocc
+
+Fortran     flang       mpif90      ifort -mp       mpif90 -fopenmp
+
+C           clang       mpiclang    icc -lomp       mpicc -fopenmp
+
+C++         clang++     mpiclang    icpc -lomp      mpicxx -fopenmp
+
+Intel Compilers
+
+module load intel mvapich2
+
+
+Fortran     ifort       mpif90      ifort -qopenmp      mpif90 -qopenmp
+
+C           icc         mpicc       icc -qopenmp        mpicc -qopenmp
+
+C++         icpc        mpicxx      icpc -qopenmp       mpicxx -qopenmp
+
+
+
+RUN JOBS
+
+srun --partition=debug  --pty --account=<<project>> --nodes=1 --ntasks-per-node=4 \
+    --mem=8G -t 00:30:00 --wait=0 --export=ALL /bin/bash
+
+srun --partition=gpu-debug --pty --account=<<project>> --ntasks-per-node=10 \
+    --nodes=1 --mem=96G --gpus=1 -t 00:30:00 --wait=0 --export=ALL /bin/bash
+
+module purge 
+module restore commands
+
+
