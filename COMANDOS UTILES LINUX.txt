@@ -13,7 +13,7 @@ xpdf    abrir archivo pdf        xpdf nombre.pdf &
 
 tecla tab           completar el directorio o archivo
 
-gfortran -Wall -o hello hello.f90   compilar programa
+   compilar programa
 ./nombreexe                         ejecutar programa
 
 
@@ -23,3 +23,6 @@ git pull        traer cambios de la nube
 nombre del commit
 + para mandar los cambios
 push
+
+pwd mac
+/Users/richardsanchez/Desktop/Visual Studio/FortranTest/Expanse

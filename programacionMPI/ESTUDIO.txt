@@ -1,0 +1,37 @@
+The first MPI lines
+
+
+MPI defines three methods of Fortran support:
+
+use mpi_f08: It requires compile-time argument checking with unique MPI handle types and provides techniques to fully solve the optimization problems with nonblocking calls. This is the only Fortran support method that is consistent with the Fortran standard (Fortran 2008 + TS 29113 and later). This method is highly recommended for all MPI applications.
+
+use mpi: It requires compile-time argument checking. Handles are defined as INTEGER. This Fortran support method is inconsistent with the Fortran standard, and its use is therefore not recommended.
+
+INCLUDE 'mpif.h': The use of the include file mpif.h is strongly discouraged starting with MPI-3.0, because this method neither guarantees compile-time argument checking nor provides sufficient techniques to solve the optimization problems with nonblocking calls, and is therefore inconsistent with the Fortran standard.
+
+
+      if (rank == 0) then
+         if (final /= ln) then
+            final = ln
+            sumaParcial = 0
+            do i = inicio, final
+               sumaParcial = sumaParcial + i
+            end do
+            write(*,*) 'rank', rank,'suma parcial', sumaParcial
+            call MPI_SEND(sumaParcial, 1, MPI_INT, 0, 1, MPI_COMM_WORLD, ierror)
+         end if
+      end if 
+
+
+               do numrank = 0, num_proc-2
+            call MPI_RECV(sumaParcial, 1, MPI_INT, numrank, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE, ierror)
+            sumaTotal = sumaTotal + sumaParcial
+         enddo
+
+         if (final /= ln) then
+            final = ln+1
+            sumaParcial = 
+            do i = inicio, final
+               sumaParcial = sumaParcial + i
+            end do
+
