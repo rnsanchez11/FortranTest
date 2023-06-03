@@ -1,0 +1,26 @@
+ node          12 : Hello world!
+ node           4 : Hello world!
+ node           5 : Hello world!
+ node          13 : Hello world!
+ node           7 : Hello world!
+ node          15 : Hello world!
+ node           0 : Hello world!
+ segundo mensaje
+ node          17 : Hello world!
+ node           1 : Hello world!
+ node          18 : Hello world!
+ node           2 : Hello world!
+ node          19 : Hello world!
+ node           3 : Hello world!
+ node          23 : Hello world!
+ node           6 : Hello world!
+ node          16 : Hello world!
+ node           8 : Hello world!
+ node          20 : Hello world!
+ node           9 : Hello world!
+ node          21 : Hello world!
+ node          10 : Hello world!
+ node          22 : Hello world!
+ node          11 : Hello world!
+ node          14 : Hello world!
+/cm/local/apps/slurm/var/spool/job22044592/slurm_script: line 23: /home/rsanchezcastellanos1/Codigos/FortranTest/ExpanseTutorial: Is a directory

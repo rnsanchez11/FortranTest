@@ -7,7 +7,12 @@ program read_netcdf
     real*8 :: data_in(nx, ny, nz)
     integer :: varid, ncid, x, y, z
     real*8 :: u, v, w, q1, Umean
-    
+    real*8, dimension(ny) :: vprofile, ydistance
+    character(len=*), parameter :: OUT_FILE = 'data.txt' ! Output file.
+    character(len=*), parameter :: PLT_FILE = 'plot.plt' ! Gnuplot file.
+    integer :: i, fu !gnuplot var
+
+
     ! Open file netCDF
     call check(nf90_open("field.data_0400", nf90_nowrite, ncid))
     ! Get the varid of the data variable, based on its name.
@@ -25,23 +30,28 @@ program read_netcdf
     do x = 1, nx
       do y = 1, ny
         do z = 1, nz
-          Umean = Umean + (data_in(x,y,z))/(nx*ny*nz)
+          Umean = Umean + (data_in(x,ny/2,nz/2))/(nx*ny*nz)
         enddo
       enddo
     enddo
     print*, "Velocity Umean: ", Umean
-`
-    ! Fluctuations
-    do z = 1, nz-1
-      do y = 1, ny-1
-        do x = 1, nx-1
-          u = (data_in(x,y,z) + data_in(x+1,y+1,z+1))/2 - Umean
-          !print*, "Velocity Fluctuations: ", u
-        enddo
-      enddo
-    enddo
-    
 
+    ! Fluctuations
+    do y = 1, ny
+          u = data_in(90,y,80)
+          vprofile(y) = u
+          ydistance(y) = (y-64)
+    enddo
+    print*, "Velocity Fluctuations: ", vprofile
+
+    ! Open a .txt file for plot
+    open (action='write', file=OUT_FILE, newunit=fu, status='replace')
+    do i = 1, ny
+        write (fu, *) vprofile(i), ydistance(i)
+    end do
+    close (fu)
+
+    call execute_command_line('gnuplot -p ' // PLT_FILE)
 
     call check( nf90_close(ncid))
 

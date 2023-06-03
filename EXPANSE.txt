@@ -70,4 +70,13 @@ module restore commands
 instalacion fortran mac
 https://ccia.ugr.es/~fjgc/fortran_mac.html
 
+copiar una carpeta
+https://www.freecodecamp.org/news/scp-linux-command-example-how-to-ssh-file-transfer-from-remote-to-local/
 
+Copy Files From Remote to Local
+scp <remote_username>@<IPorHost>:<PathToFile>   <LocalFileLocation>
+example:
+scp -r ssh rsanchezcastellanos1@login.expanse.sdsc.edu:/home/rsanchezcastellanos1/Codigos/FortranTest/ExpanseTutorial /Users/richardsanchez/Desktop
+
+Copy File From Local Host to Remote Server
+scp test.txt userbravo@destination:/location2

@@ -3,12 +3,12 @@ cd      cambiar directorio
 ls      Lista de los directorios que haya
 pwd     ruta de los directorios
 mkdir   crea directorios
-rmdir   borra directorios
+rmdir   borra directorios vacios
 
 cp      copiar archivos
 mv      pegar archivos
 rm      borrar archivos
-
+rm -vrf borrar directorios llenos
 xpdf    abrir archivo pdf        xpdf nombre.pdf &
 
 tecla tab           completar el directorio o archivo
