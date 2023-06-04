@@ -1,9 +1,9 @@
 # plot.plt
 
-set title "Fortran Example"
+set title "Mean Velocity Profile"
 set nokey
 set grid
-set xlabel "y/d"
-set ylabel "<U>/U"
+set xlabel "<U>/U"
+set ylabel "y/d"
 m="data.txt"
 plot m using 1:2 with linespoints
