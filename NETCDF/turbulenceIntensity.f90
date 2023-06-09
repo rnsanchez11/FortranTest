@@ -1,5 +1,5 @@
 ! compiling
-! gfortran -o field.out meanprofile.f90 -I/opt/homebrew/Cellar/netcdf-fortran/4.6.0_1/include -L/opt/homebrew/Cellar/netcdf-fortran/4.6.0_1/lib -lnetcdff
+! gfortran -o field.out turbulenceIntensity.f90 -I/opt/homebrew/Cellar/netcdf-fortran/4.6.0_1/include -L/opt/homebrew/Cellar/netcdf-fortran/4.6.0_1/lib -lnetcdff
 
 ! This program do the postprocecing of a DNS simulation file
 ! using 1:2 with linespoints  , (-(x)**2 - 1) with lines
@@ -24,7 +24,7 @@ program meanprofile
 
   ! open various files
   nn1 = "field.data_0"
-    do ii = 400, 400, 2
+  do ii = 400, 400, 2
     write(nn2,"(i3)")ii ! (i3) numero de cifras
     field = nn1//nn2
     print*, field
@@ -61,7 +61,17 @@ program meanprofile
     enddo
 
     ! Turbulence intensitive
-
+    uf = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          Uf = q1(x,y,z) - Uxz
+        enddo
+      enddo
+      ufluct(y,1) = Umean
+      !print*, "Velocity Uxz: ", Uxz
+      Umean = 0
+    enddo
 
 
     ! Read the y grid for plot
