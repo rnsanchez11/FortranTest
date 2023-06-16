@@ -14,7 +14,7 @@ program PPfielddata
   character(len=3) :: nn2                                                   ! # nombre del los archivos multiples
   character(len=15) :: field                                                ! nombre de los archivos
   integer, parameter :: nx = 192, ny = 128, nz = 160                        ! Dimensions
-  integer, parameter :: s = 249, ti = 180, tf = 400, tdiff = (tf - ti)/2
+  integer, parameter :: s = 249, ti = 380, tf = 400, tdiff = (tf - ti)/2
   integer :: varid, ncid, x, y, z                                           ! id variable netcdf, id file netcdf, contadores x,y,z
   integer :: i, t, fu, fu2, fu3, fu4                                        ! contador, var for open files
   real*8 :: q1(nx, ny, nz), q2(nx, ny, nz), q3(nx, ny, nz)                  ! data 
@@ -35,7 +35,7 @@ program PPfielddata
   real*8, parameter :: rho = 1
   real*8, parameter :: Reynoldsc = 4200
   real*8 :: viscinematica, tw
-  real*8, dimension(ny,1) :: ty
+  real*8, dimension(ny,1) :: ty, viscoustress
 
 ! GRID ----------------------------------------------------------------------------------------------------------
   ! Read the y grid for plot
@@ -132,7 +132,7 @@ program PPfielddata
   end do 
   close (fu)
   call check(nf90_close(ncid))
-  call execute_command_line('gnuplot -p ' // PLT_FILE) !ejecuta el comando para graficar en gnuplot
+  !call execute_command_line('gnuplot -p ' // PLT_FILE) !ejecuta el comando para graficar en gnuplot
 
 
 ! TURBULENCE INTENSITY -----------------------------------------------------------------------------------------------
@@ -148,28 +148,41 @@ program PPfielddata
   !tw = 0.00175
   print*, "tw is ",tw
 
+  ! total shear stress
   do y = 1, ny
-  ty(y,1) = (1-(ydistance(y,1)/hwc))
+  ty(y,1) = (1-((ydistance(y,1)+1)/hwc))
   enddo
+
+  viscoustress(1,1) = tw
+  ! viscous stress
+  do y = 2, ny
+    viscoustress(y,1) = rho*((Uxz(y,1)-Uxz(y-1,1))/((ydistance(y,1))-(ydistance(y-1,1))))
+  enddo
+
+  open (action='write', file="viscoustress.txt", newunit=fu, status='replace')
+  do i = 1, ny
+      write (fu, *) ydistance(i,1), viscoustress(i,1)
+  end do
+  close (fu)
 
   ut = sqrt(tw/rho)
   print*, "ut is ",ut
   print*, "Ret is ", ut/viscinematica
   !Distance y+
   do y = 1, ny
-    yplus(y,1) = ut*ydistance(y,1)/viscinematica
+    yplus(y,1) = ut*(ydistance(y,1)+1)/viscinematica
   enddo
   !print*, yplus
 
   ! Open a .txt file for plot
-  open (action='write', file=OUT_FILE, newunit=fu, status='replace')
+  open (action='write', file="totalshear.txt", newunit=fu, status='replace')
   do i = 1, ny
-      write (fu, *) ty(i,1), yplus(i,1)
+      write (fu, *) ydistance(i,1), ty(i,1)
   end do
   close (fu)
 
   !ejecuta el comando para graficar en gnuplot
-  !call execute_command_line('gnuplot -p ' // "plot2.plt")
+  call execute_command_line('gnuplot -p ' // "plotTotalstress.plt")
 
 
 
@@ -246,20 +259,21 @@ program PPfielddata
     enddo
   close (fu3)
 
-  ! Open a .txt file for plot
-  open (action='write', file=OUT_FILE, newunit=fu, status='replace')
+  open (action='write', file="dataTurbInt.txt", newunit=fu, status='replace')
   do i = 1, ny
-      write (fu, *) urmsfinal(i,1), ydistance(i,1)
+      write (fu, *) ydistance(i,1), urmsfinal(i,1)
   end do
   close (fu)
+  !call execute_command_line('gnuplot -p ' // "plotTurbInt.plt")
 
-  !ejecuta el comando para graficar en gnuplot
+  open (action='write', file="dataTurbInt.txt", newunit=fu, status='replace')
+  do i = 1, ny/2
+      write (fu, *) yplus(i,1), urmsfinal(i,1)
+  end do
+  close (fu)
+  !call execute_command_line('gnuplot -p ' // "plotTurbIntyp.plt")
+
   call check(nf90_close(ncid))
-  call execute_command_line('gnuplot -p ' // "plot2.plt")
-
-
-
-
 
 
 
