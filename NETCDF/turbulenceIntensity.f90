@@ -16,14 +16,14 @@ program meanprofile
     integer, parameter :: nx = 192, ny = 128, nz = 160      ! Dimensions
     integer :: varid, ncid, x, y, z                         ! id variable netcdf, id file netcdf, contadores x,y,z
     integer :: i, ii, fu, fu2, fu3                          ! contador, var for open files
-    real*8 :: q1(nx, ny, nz)                                ! data 
+    real*8 :: q1(nx, ny, nz), uf(nx, ny, nz)                                ! data 
     real*8 :: u, v, w, Umean, Ux                            ! work variables 
     real*8, dimension(ny,1) :: vprofile, ydistance, y1, y3
     real*8, dimension(ny,1) :: Uxz, Ulinear
     real, dimension(ny,1) :: x11, y11
 
   ! open various files
-  nn1 = "field.data_0"
+  nn1 = 'field.data_0'
   do ii = 400, 400, 2
     write(nn2,"(i3)")ii ! (i3) numero de cifras
     field = nn1//nn2
@@ -65,12 +65,9 @@ program meanprofile
     do y = 1, ny
       do x = 1, nx
         do z = 1, nz
-          Uf = q1(x,y,z) - Uxz
+          uf(x,y,z) = q1(x,y,z) - Uxz(y,1)
         enddo
       enddo
-      ufluct(y,1) = Umean
-      !print*, "Velocity Uxz: ", Uxz
-      Umean = 0
     enddo
 
 
@@ -88,7 +85,7 @@ program meanprofile
     ! Open a .txt file for plot
     open (action='write', file=OUT_FILE, newunit=fu, status='replace')
     do i = 1, ny
-        write (fu, *) Uxz(i,1), ydistance(i,1)
+        write (fu, *) uf(1,i,1), ydistance(i,1)
     end do
     close (fu)
 
