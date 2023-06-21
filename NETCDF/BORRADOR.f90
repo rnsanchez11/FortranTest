@@ -1,19 +1,21 @@
-program main
-    character(len=12) :: nn1
-    character(len=3) :: nn2
-    character(len=15) :: field
-    integer :: ii,k
+program four_dimensional_array
+  implicit none
+  integer, parameter :: nx = 192, ny = 128, nz = 160, nt = 60
+  real*8 ::  prueba(nx, ny, nz, nt)
+  integer :: x, y, z, t
 
-    nn1 = 'field.data_0'
-    do ii = 400, 408, 2
-      write(nn2,'(i3)')ii
-      field = nn1//nn2
-      print*, field
+  do t = 1, nt
+    do x = 1, nx
+      do y = 1, ny
+        do z = 1, nz
+          prueba(x, y, z, t) = 2.5 +t
+        end do
+      end do
+    end do
+  end do
 
-      open(unit=k,file=field,status='old',action='read')
-        write(*,*) 'hola'
-      close (unit=k)
+  print*, prueba(1,2,3,4)
+  
+end program four_dimensional_array
 
-    enddo
 
-end program

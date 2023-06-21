@@ -1,6 +1,6 @@
 # plot.plt
 
-set title "{/:Bold Mean Turbulence intensities}" font "Times-New-Roman,18"
+set title "{/:Bold Turbulence intensities}" font "Times-New-Roman,18"
 set nokey
 set grid
 set key right top
@@ -9,5 +9,6 @@ set key right top
 set ylabel "u rms, v rms, w rms" font "Times-New-Roman,14"
 set xlabel "y+" font "Times-New-Roman,14"
 #set view equal xy
-fluctuations = "dataTurbInt.txt"
-plot fluctuations with lines lt rgb "red"
+fluctuationsx = "dataTurbIntypx.txt"
+fluctuationsy = "dataTurbIntypy.txt"
+plot fluctuationsx with lines lt rgb "red", fluctuationsy with lines lt rgb "blue"
