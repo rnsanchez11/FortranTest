@@ -11,4 +11,5 @@ set xlabel "y/δ" font "Times-New-Roman,14"
 #set view equal xy
 fluctuationsx = "dataTurbIntx.txt"
 fluctuationsy = "dataTurbInty.txt"
-plot fluctuationsx with lines lt rgb "red", fluctuationsy with lines lt rgb "blue"
+fluctuationsz = "dataTurbIntz.txt"
+plot fluctuationsx with lines lt rgb "red", fluctuationsy with lines lt rgb "blue", fluctuationsz with lines lt rgb "green"

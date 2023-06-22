@@ -1,5 +1,7 @@
 ! compiling
 ! gfortran -o field.out PPfielddata.f90 -I/opt/homebrew/Cellar/netcdf-fortran/4.6.0_1/include -L/opt/homebrew/Cellar/netcdf-fortran/4.6.0_1/lib -lnetcdff
+!LINUX
+!gfortran -o field.out PPfielddata.f90 -I/usr/include -I/usr/include -L/usr/lib/x86_64-linux-gnu -lnetcdff -Wl,-Bsymbolic-functions -flto=auto -ffat-lto-objects -flto=auto -Wl,-z,relro -Wl,-z,now -lnetcdf -lnetcdf -lm
 
 ! This program do the postprocecing of a DNS simulation file
 
@@ -12,27 +14,28 @@ program PPfielddata
   character(len=3) :: nn2                                                   ! # nombre del los archivos multiples
   character(len=15) :: field                                                ! nombre de los archivos
   integer, parameter :: nx = 192, ny = 128, nz = 160, nt = 249              ! Dimensions
-  integer, parameter :: s = 249, ti = 380, tf = 400, tdiff = (tf - ti)/2
+  integer, parameter :: s = 249, ti = 400, tf = 400, tdiff = (tf - ti)/2
   integer :: varid, ncid                                            ! id variable netcdf, id file netcdf, contadores x,y,z
   integer :: x, y, z, i, t
   integer :: fu, fu2, fu3, fu4                                        ! contador, var for open files
-  real*8 :: q1(nx, ny, nz), q2(nx, ny, nz), q3(nx, ny, nz), prueba(nx, ny, nz, nt)                  ! data 
+  real*8 :: q1(nx, ny, nz), q2(nx, ny, nz), q3(nx, ny, nz)                  ! data 
   real*8 :: flucx(nx,ny,nz), flucy(nx,ny,nz), flucz(nx,ny,nz)
-  real*8 :: urms1, vrms1, ut, Reynoldsc
+  real*8 :: urms1, vrms1, wrms1, ut, Reynoldsc
   real*8 :: u, v, w, Um, Ux, Umean                                          ! work variables 
   real*8, dimension(nx,1) :: xdistance, x1, x3
   real*8, dimension(nx,1) :: xprofile
   real*8, dimension(ny,1) :: Uxxz, vprofile
   real*8, dimension(ny,1) :: Uyxz, vyprofile
+  real*8, dimension(ny,1) :: Uwxz, vwprofile
   real*8, dimension(ny,1) :: ydistance, y1, y3
   real*8, dimension(ny,1) :: x11, y11
   real*8, dimension(ny,1) :: Umeantotal, Ulaminar
-  real*8, dimension(ny,1) :: urmsfinal, vrmsfinal
-  real*8, dimension(ny,1) :: urms, vrms
+  real*8, dimension(ny,1) :: urmsfinal, vrmsfinal, wrmsfinal
+  real*8, dimension(ny,1) :: urms, vrms, wrms
   real*8, dimension(ny,1) :: yplus
   real*8, dimension(ny*(tdiff+1),1) :: ydistancetotal, yplustotal
-  real*8, dimension(ny*(tdiff+1),1) :: urmstotal, vrmstotal
-  real*8, dimension(ny*(tdiff+1),1) :: Uxxztotal, Uyxztotal
+  real*8, dimension(ny*(tdiff+1),1) :: urmstotal, vrmstotal, wrmstotal
+  real*8, dimension(ny*(tdiff+1),1) :: Uxxztotal, Uyxztotal, Uwxztotal
 
   real*8, parameter :: Upared = 0
   real*8, parameter :: hwc = 1
@@ -52,7 +55,7 @@ program PPfielddata
   close (fu2)
 
   ! Read the X grid for plot
-  open (action='read', file='Xgrid.plo', unit=fu2, status='old')
+  open (action='read', file='xgrid.plo', unit=fu2, status='old')
     do x = 1, nx
       read(fu2,*) x1(x,1), xdistance(x,1), x3(x,1)
     enddo
@@ -67,15 +70,7 @@ program PPfielddata
 ! MEAN VELOCITY PROFILE -----------------------------------------------------------------------------------------------
 
 
-  do t = 1, nt
-    do x = 1, nx
-      do y = 1, ny
-        do z = 1, nz
-          prueba(x, y, z, t) = 2.5
-        end do
-      end do
-    end do
-  end do
+
 
   ! X velocity ----------------------------------------------------------------
   ! Open a .txt file for plot
@@ -147,9 +142,9 @@ program PPfielddata
   end do 
   close (fu)
   call check(nf90_close(ncid))
-  call execute_command_line('gnuplot -p ' // 'plotmeanvelx.plt') !ejecuta el comando para graficar en gnuplot
+  !call execute_command_line('gnuplot -p ' // 'plotmeanvelx.plt') !ejecuta el comando para graficar en gnuplot
 
-
+  print*,"hola", Uxxz(1,1)
 
 
 
@@ -174,8 +169,8 @@ program PPfielddata
 
       ! Grafica de un punto de la simulacion
       do y = 1, ny
-        u = q2(10,y,10)
-        vyprofile(y,1) = u
+        v = q2(10,y,10)
+        vyprofile(y,1) = v
       enddo
 
       open (action='write', file="Onepointy.txt", newunit=fu2, status='replace')
@@ -229,6 +224,85 @@ program PPfielddata
   close (fu)
   call check(nf90_close(ncid))
   !call execute_command_line('gnuplot -p ' // 'plotmeanvely.plt') !ejecuta el comando para graficar en gnuplot
+
+  
+
+
+
+    ! Z velocity ----------------------------------------------------------------
+  ! Open a .txt file for plot
+  open (action='write', file="Uzmean.txt", newunit=fu, status='replace')
+    
+    ! open various files
+    nn1 = "field.data_0"
+    do t = ti, tf, 2
+      write(nn2,"(i3)")t ! (i3) numero de cifras
+      field = nn1//nn2
+
+      
+      call check(nf90_open(field, nf90_nowrite, ncid)) ! Open file netCDF
+      call check(nf90_inq_varid(ncid, "q3", varid))    ! Get the varid of the data variable, based on its name.
+      call check(nf90_get_var(ncid, varid, q3))        ! Read the data.
+
+      ! Grafica de un punto de la simulacion
+      do y = 1, ny
+        w = q3(10,y,10)
+        vwprofile(y,1) = w
+      enddo
+
+      open (action='write', file="Onepointw.txt", newunit=fu2, status='replace')
+      do i = 1, ny
+      write (fu2, *) vwprofile(i,1), ydistance(i,1)
+      enddo 
+      close (fu2)
+      !call execute_command_line('gnuplot -p ' // 'plotonepoint.plt') !ejecuta el comando para graficar en gnuplot
+
+      ! Mean velocity field: U(x,t) = <U(x,t)> + u(x,t)
+      ! mean velocity x-z plane
+      Um = 0
+      do y = 1, ny
+        do x = 1, nx
+          do z = 1, nz
+            Um = Um + (q3(x,y,z))/(nx*nz)
+          enddo
+        enddo
+        Uwxz(y,1) = Um
+        Um = 0
+      enddo
+      
+
+      do i = 1, ny
+          write (fu, *) Uwxz(i,1), ydistance(i,1), t    !Write the file to plot
+      end do
+
+    enddo
+  close (fu)
+
+  open (action='read', file='Uzmean.txt', unit=fu3, status='old')
+    do y = 1, ny*(tdiff+1)
+    read(fu3,*) Uwxztotal(y,1), ydistancetotal(y,1)
+    enddo
+
+    Umean = 0
+    do y = 1, ny
+    do i = 0, tdiff
+      Umean = Umean + Uwxztotal(y+i*128,1)/(tdiff+1)
+    enddo
+    Umeantotal(y,1) = Umean
+    Umean = 0
+    enddo
+  close (fu3)
+
+  ! Open a .txt file for plot
+  open (action='write', file='plotmeanvel.txt', newunit=fu, status='replace')
+  do i = 1, ny
+    write (fu, *) Umeantotal(i,1), ydistance(i,1)
+  end do 
+  close (fu)
+  call check(nf90_close(ncid))
+  !call execute_command_line('gnuplot -p ' // 'plotmeanvely.plt') !ejecuta el comando para graficar en gnuplot
+
+
 
 
 
@@ -454,14 +528,103 @@ do i = 1, ny
     write (fu, *) ydistance(i,1), vrmsfinal(i,1)
 end do
 close (fu)
-call execute_command_line('gnuplot -p ' // "plotTurbInt.plt")
+!call execute_command_line('gnuplot -p ' // "plotTurbInt.plt")
 
 open (action='write', file="dataTurbIntypy.txt", newunit=fu, status='replace')
 do i = 1, ny/2
     write (fu, *) yplus(i,1), vrmsfinal(i,1)
 end do
 close (fu)
-call execute_command_line('gnuplot -p ' // "plotTurbIntyp.plt")
+!call execute_command_line('gnuplot -p ' // "plotTurbIntyp.plt")
+
+call check(nf90_close(ncid))
+
+
+
+
+open (action='write', file="fluctuationsz.txt", newunit=fu, status='replace')
+    
+  ! open various files
+  nn1 = "field.data_0"
+  do t = ti, tf, 2
+    write(nn2,"(i3)")t ! (i3) numero de cifras
+    field = nn1//nn2
+    
+    call check(nf90_open(field, nf90_nowrite, ncid)) ! Open file netCDF
+    call check(nf90_inq_varid(ncid, "q3", varid))    ! Get the varid of the data variable, based on its name.
+    call check(nf90_get_var(ncid, varid, q3))        ! Read the data.
+
+    ! Mean velocity field: U(x,t) = <Ux,t)> + u(x,t)
+    ! mean velocity x-z plane
+    Um = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          Um = Um + (q3(x,y,z))/(nx*nz)
+        enddo
+      enddo
+      Uwxz(y,1) = Um
+      Um = 0
+    enddo
+    
+    ! Fluctuations in x
+    flucz = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          flucz(x,y,z) = (q3(x,y,z) - Uwxz(y,1))**2
+        enddo
+      enddo
+    enddo
+
+    wrms1 = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          wrms1 = wrms1 + (sqrt(flucz(x,y,z)))/(nx*nz)
+          !vrms1 = vrms1 + (flucy(x,y,z))/(nx*nz)
+        enddo
+      enddo
+      wrms(y,1) = wrms1/ut
+      wrms1 = 0
+    enddo
+    !print*, urms
+
+    do i = 1, ny
+        write (fu, *) wrms(i,1), yplus(i,1), t    !Write the file to plot
+    end do
+
+  enddo
+close (fu)
+
+open (action='read', file='fluctuationsz.txt', unit=fu3, status='old')
+  do y = 1, ny*(tdiff+1)
+    read(fu3,*) wrmstotal(y,1), yplustotal(y,1)
+  enddo
+
+  Um = 0
+  do y = 1, ny
+    do i = 0, tdiff
+      Um = Um + wrmstotal(y+i*128,1)/(tdiff+1)
+    enddo
+    wrmsfinal(y,1) = Um
+    Um = 0
+  enddo
+close (fu3)
+
+open (action='write', file="dataTurbIntz.txt", newunit=fu, status='replace')
+do i = 1, ny
+    write (fu, *) ydistance(i,1), wrmsfinal(i,1)
+end do
+close (fu)
+!call execute_command_line('gnuplot -p ' // "plotTurbInt.plt")
+
+open (action='write', file="dataTurbIntypz.txt", newunit=fu, status='replace')
+do i = 1, ny/2
+    write (fu, *) yplus(i,1), wrmsfinal(i,1)
+end do
+close (fu)
+!call execute_command_line('gnuplot -p ' // "plotTurbIntyp.plt")
 
 call check(nf90_close(ncid))
 
