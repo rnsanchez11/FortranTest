@@ -19,7 +19,7 @@ program PPfielddata
   integer :: varid, ncid                                                    ! id variable netcdf, id file netcdf, contadores x,y,z
   integer :: x, y, z, i, t
   integer :: fu, fu1, fu2, fu3, fu4, fu5, fu6                                         ! contador, var for open files
-  integer :: fu7, fu8, fu9, f1, f2, f3
+  integer :: fu7, fu8, fu9, f1, f2, f3, iostat
   real*8 :: q1(nx, ny, nz), q2(nx, ny, nz), q3(nx, ny, nz)                  ! data 
   real*8 :: flucx(nx,ny,nz), flucy(nx,ny,nz), flucz(nx,ny,nz), flucuv(nx,ny,nz)
   real*8 :: urms1, vrms1, wrms1, uvrms1, ut, Reynoldsc
@@ -316,6 +316,8 @@ program PPfielddata
   open (action='write', file="fluctuationsy.txt", newunit=fu2, status='replace')
   open (action='write', file="fluctuationsz.txt", newunit=fu3, status='replace')
   open (action='write', file="fluctuationsuv.txt", newunit=fu8, status='replace')   
+
+  do t = ti, tf, 2
   
       ! Fluctuations in x, y, z
       flucx = 0
@@ -352,7 +354,7 @@ program PPfielddata
         vrms1 = 0
         wrms(y,1) = wrms1/ut
         wrms1 = 0
-        uvrms(y,1) = uvrms1/ut
+        uvrms(y,1) = uvrms1
         uvrms1 = 0
       enddo
       !print*, urms
@@ -369,7 +371,7 @@ program PPfielddata
       do i = 1, ny
         write (fu8, *) uvrms(i,1), yplus(i,1), t    !Write the file to plot
       end do
-
+    enddo
   close (fu1)
   close (fu2)
   close (fu3)
@@ -377,7 +379,7 @@ program PPfielddata
   
   open (action='read', file='fluctuationsx.txt', unit=f1, status='old')
     do y = 1, ny*(tdiff+1)
-      read(f1,*) urmstotal(y,1), yplustotal(y,1)
+      read(f1,*,IOSTAT=iostat) urmstotal(y,1), yplustotal(y,1)
     enddo
 
     Ux = 0
@@ -392,7 +394,7 @@ program PPfielddata
 
   open (action='read', file='fluctuationsy.txt', unit=f2, status='old')
     do y = 1, ny*(tdiff+1)
-      read(f2,*) vrmstotal(y,1), yplustotal(y,1)
+      read(f2,*,IOSTAT=iostat) vrmstotal(y,1), yplustotal(y,1)
     enddo
 
     Uy = 0
@@ -407,7 +409,7 @@ program PPfielddata
 
   open (action='read', file='fluctuationsz.txt', unit=f3, status='old')
     do y = 1, ny*(tdiff+1)
-      read(f3,*) wrmstotal(y,1), yplustotal(y,1)
+      read(f3,*,IOSTAT=iostat) wrmstotal(y,1), yplustotal(y,1)
     enddo
 
     Uz = 0
@@ -426,6 +428,19 @@ program PPfielddata
       write (fu, *) ydistance(i,1), urmsfinal(i,1)
   end do
   close (fu)
+
+  open (action='write', file="dataTurbInty.txt", newunit=fu1, status='replace')
+  do i = 1, ny
+      write (fu1, *) ydistance(i,1), vrmsfinal(i,1)
+  end do
+  close (fu1)
+
+  open (action='write', file="dataTurbIntz.txt", newunit=fu2, status='replace')
+  do i = 1, ny
+      write (fu2, *) ydistance(i,1), wrmsfinal(i,1)
+  end do
+  close (fu2)
+
   call execute_command_line('gnuplot -p ' // "plotTurbInt.plt")
 
   open (action='write', file="dataTurbIntypx.txt", newunit=fu, status='replace')
