@@ -1,6 +1,6 @@
 # plot.plt
 
-set title "{/:Bold Turbulence intensities}" font "Times-New-Roman,18"
+#set title "{/:Bold Turbulence intensities}" font "Times-New-Roman,18"
 set nokey
 set grid
 set key right top

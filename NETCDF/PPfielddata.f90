@@ -33,7 +33,7 @@ program PPfielddata
   close (fu2)
 
   ! Read the X grid for plot
-  open (action='read', file='Xgrid.plo', unit=fu2, status='old')
+  open (action='read', file='xgrid.plo', unit=fu2, status='old')
     do x = 1, nx
       read(fu2,*) x1(x,1), xdistance(x,1), x3(x,1)
     enddo

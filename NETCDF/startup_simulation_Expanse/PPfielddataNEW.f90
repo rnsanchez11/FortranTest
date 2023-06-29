@@ -15,9 +15,9 @@ program PPfielddata
   character(len=15) :: field                                                ! nombre de los archivos
 
   integer, parameter :: nx = 192, ny = 128, nz = 160, nt = 249              ! Dimensions
-  integer, parameter :: s = 249, ti = 400, tf = 400, tdiff = (tf - ti)/2
+  integer, parameter :: s = 249, ti = 200, tf = 400, tdiff = (tf - ti)/2
   integer :: varid, ncid                                                    ! id variable netcdf, id file netcdf, contadores x,y,z
-  integer :: x, y, z, i, t
+  integer :: x, y, z, i, t, iii
   integer :: fu, fu1, fu2, fu3, fu4, fu5, fu6                                         ! contador, var for open files
   integer :: fu7, fu8, fu9, f1, f2, f3, iostat
   real*8 :: q1(nx, ny, nz), q2(nx, ny, nz), q3(nx, ny, nz)                  ! data 
@@ -313,68 +313,125 @@ program PPfielddata
 
 
   open (action='write', file="fluctuationsx.txt", newunit=fu1, status='replace')
+  do t = ti, tf, 2
+
+    flucx = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          flucx(x,y,z) = (q1(x,y,z) - Uxxz(y,1))**2
+        enddo
+      enddo
+    enddo
+
+    urms1 = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          urms1 = urms1 + (sqrt(flucz(x,y,z)))/(nx*nz)
+        enddo
+      enddo
+      urms(y,1) = urms1/ut
+      urms1 = 0
+    enddo
+
+    do i = 1, ny
+      write (fu1, *) urms(i,1), yplus(i,1), t    !Write the file to plot
+    end do
+
+  enddo
+  close (fu1)
+
   open (action='write', file="fluctuationsy.txt", newunit=fu2, status='replace')
+  do t = ti, tf, 2
+
+    flucy = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          flucy(x,y,z) = (q2(x,y,z) - Uyxz(y,1))**2
+        enddo
+      enddo
+    enddo
+
+    vrms1 = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          vrms1 = vrms1 + (sqrt(flucy(x,y,z)))/(nx*nz)
+        enddo
+      enddo
+      vrms(y,1) = vrms1/ut
+      vrms1 = 0
+    enddo
+
+    do i = 1, ny
+      write (fu2, *) vrms(i,1), yplus(i,1), t    !Write the file to plot
+    end do
+
+  enddo
+  close (fu2)
+
   open (action='write', file="fluctuationsz.txt", newunit=fu3, status='replace')
+  do t = ti, tf, 2
+
+    flucz = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          flucz(x,y,z) = (q3(x,y,z) - Uzxz(y,1))**2
+        enddo
+      enddo
+    enddo
+
+    wrms1 = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          wrms1 = wrms1 + (sqrt(flucz(x,y,z)))/(nx*nz)
+        enddo
+      enddo
+      wrms(y,1) = wrms1/ut
+      wrms1 = 0
+    enddo
+
+
+    do i = 1, ny
+        write (fu, *) wrms(i,1), yplus(i,1), t    !Write the file to plot
+    end do
+
+  enddo
+  close (fu3)
+
   open (action='write', file="fluctuationsuv.txt", newunit=fu8, status='replace')   
 
   do t = ti, tf, 2
-  
-      ! Fluctuations in x, y, z
-      flucx = 0
-      flucy = 0
-      flucz = 0
-      flucuv = 0
-      do y = 1, ny
-        do x = 1, nx
-          do z = 1, nz
-            flucx(x,y,z) = (q1(x,y,z) - Uxxz(y,1))**2
-            flucy(x,y,z) = (q2(x,y,z) - Uyxz(y,1))**2
-            flucz(x,y,z) = (q3(x,y,z) - Uzxz(y,1))**2
-            flucuv(x,y,z) = (q1(x,y,z) - Uxxz(y,1))*(q2(x,y,z) - Uyxz(y,1))
-          enddo
+
+    flucuv = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          flucuv(x,y,z) = (q1(x,y,z) - Uxxz(y,1))*(q2(x,y,z) - Uyxz(y,1))
         enddo
       enddo
-
-      urms1 = 0
-      vrms1 = 0
-      wrms1 = 0
-      uvrms1 = 0
-      do y = 1, ny
-        do x = 1, nx
-          do z = 1, nz
-            urms1 = urms1 + (sqrt(flucx(x,y,z)))/(nx*nz)
-            vrms1 = vrms1 + (sqrt(flucy(x,y,z)))/(nx*nz)
-            wrms1 = wrms1 + (sqrt(flucz(x,y,z)))/(nx*nz)
-            uvrms1 = uvrms1 + ((flucuv(x,y,z)))/(nx*nz)
-          enddo
-        enddo
-        urms(y,1) = urms1/ut
-        urms1 = 0
-        vrms(y,1) = vrms1/ut
-        vrms1 = 0
-        wrms(y,1) = wrms1/ut
-        wrms1 = 0
-        uvrms(y,1) = uvrms1
-        uvrms1 = 0
-      enddo
-      !print*, urms
-
-      do i = 1, ny
-        write (fu1, *) urms(i,1), yplus(i,1), t    !Write the file to plot
-      end do
-      do i = 1, ny
-        write (fu2, *) vrms(i,1), yplus(i,1), t    !Write the file to plot
-      end do
-      do i = 1, ny
-        write (fu3, *) wrms(i,1), yplus(i,1), t    !Write the file to plot
-      end do
-      do i = 1, ny
-        write (fu8, *) uvrms(i,1), yplus(i,1), t    !Write the file to plot
-      end do
     enddo
-  close (fu1)
-  close (fu2)
-  close (fu3)
+
+    uvrms1 = 0
+    do y = 1, ny
+      do x = 1, nx
+        do z = 1, nz
+          uvrms1 = uvrms1 + ((flucuv(x,y,z)))/(nx*nz)
+        enddo
+      enddo
+      uvrms(y,1) = uvrms1
+      uvrms1 = 0
+    enddo
+
+    do i = 1, ny
+      write (fu1, *) uvrms(i,1), yplus(i,1), t    !Write the file to plot
+    end do
+
+  enddo
   close (fu8)
   
   open (action='read', file='fluctuationsx.txt', unit=f1, status='old')
@@ -448,6 +505,19 @@ program PPfielddata
       write (fu, *) yplus(i,1), urmsfinal(i,1)
   end do
   close (fu)
+
+  open (action='write', file="dataTurbIntypy.txt", newunit=fu1, status='replace')
+  do i = 1, ny/2
+      write (fu1, *) yplus(i,1), vrmsfinal(i,1)
+  end do
+  close (fu1)
+
+  open (action='write', file="dataTurbIntypz.txt", newunit=fu2, status='replace')
+  do i = 1, ny/2
+      write (fu2, *) yplus(i,1), wrmsfinal(i,1)
+  end do
+  close (fu2)
+
   call execute_command_line('gnuplot -p ' // "plotTurbIntyp.plt")
 
 
