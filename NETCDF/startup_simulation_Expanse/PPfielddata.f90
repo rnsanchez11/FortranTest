@@ -15,7 +15,7 @@ program PPfielddata
   character(len=15) :: field                                                ! nombre de los archivos
 
   integer, parameter :: nx = 192, ny = 128, nz = 160, nt = 249              ! Dimensions
-  integer, parameter :: s = 249, ti = 0, tf = 0, tdiff = (tf - ti)/2
+  integer, parameter :: s = 249, ti = 300, tf = 400, tdiff = (tf - ti)/2
   integer :: varid, ncid                                                    ! id variable netcdf, id file netcdf, contadores x,y,z
   integer :: x, y, z, i, t, iii
   integer :: fu, fu1, fu2, fu3, fu4, fu5, fu6                                         ! contador, var for open files
@@ -87,7 +87,7 @@ program PPfielddata
     do t = ti, tf, 2
       write(nn2,"(i3)")t ! (i3) numero de cifras
       field = nn1//nn2
-      print*, field
+      !print*, field
       
       call check(nf90_open(field, nf90_nowrite, ncid)) ! Open file netCDF
       call check(nf90_inq_varid(ncid, "q1", varid))    ! Get the varid of the data variable, based on its name.
@@ -99,7 +99,7 @@ program PPfielddata
         vxprofile(y,1) = u
       enddo
 
-      open (action='write', file="Onepoint.txt", newunit=fu2, status='replace')
+      open (action='write', file="Onepointx.txt", newunit=fu2, status='replace')
       do i = 1, ny
       write (fu2, *) vxprofile(i,1), ydistance(i,1)
       enddo 
